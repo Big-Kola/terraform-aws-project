@@ -9,7 +9,7 @@ resource "aws_security_group" "alb_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["105.127.7.121/32"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -33,7 +33,7 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 
-# Security Group for EC2 Instances (App Tier)
+# Security Group for EC2 Instances
 resource "aws_security_group" "app_sg" {
   name        = "app-security-group-${var.environment}"
   description = "Security group for application instances - only allow traffic from ALB"
@@ -56,7 +56,7 @@ resource "aws_security_group" "app_sg" {
   }
 
   egress {
-    description = "Allow all outbound (for updates via NAT)"
+    description = "Allow all outbound for updates via NAT"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -68,18 +68,18 @@ resource "aws_security_group" "app_sg" {
   }
 }
 
-# Security Group for SSH access (optional - restrict to your IP)
+# Security Group for SSH access
 resource "aws_security_group" "allow_ssh" {
   name        = "allow-ssh-${var.environment}"
-  description = "Allow SSH access - RESTRICT THIS TO YOUR IP IN PRODUCTION"
+  description = "Allow SSH access from my IP only"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description = "SSH from anywhere - CHANGE THIS"
+    description = "SSH from my IP only"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # TODO: Change to your IP: ["YOUR_IP/32"]
+    cidr_blocks = ["105.127.7.121/32"]
   }
 
   egress {
@@ -93,5 +93,3 @@ resource "aws_security_group" "allow_ssh" {
     Name = "ssh-security-group-${var.environment}"
   }
 }
-
-
